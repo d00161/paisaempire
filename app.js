@@ -32,6 +32,10 @@ app.get('/test', authenticate, async (req, res) => {
     res.json({ message: 'Protected route accessed successfully', user: req.user, userDetails: user });
 });
 
+app.get('/', (req, res)=>{
+  res.send("this is a testing api");
+});
+
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
