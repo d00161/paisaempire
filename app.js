@@ -33,7 +33,7 @@ app.get('/test', authenticate, async (req, res) => {
 });
 
 app.get('/', (req, res)=>{
-  res.send("this is a testing api");
+  res.send("This api is for testing.");
 });
 
 
