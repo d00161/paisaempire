@@ -44,7 +44,11 @@ app.get('/testget', (req, res)=>{
 });
 
 app.post('/testpost', (req, res) => {
-  res.send("this api is for testing post request");
+  const userDetails = {
+    username: "testuser",
+    mobile: "testmobile"
+  }
+  res.send(userDetails);
 });
 
 app.listen(port, () => {
