@@ -5,7 +5,7 @@ const loginRoute = require('./routes/login');
 const rechargeRoute = require('./routes/recharge')
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
-
+var cors = require('cors')
 
 const db = require('./db');
 const authenticate = require('./middleware/authenticate');
