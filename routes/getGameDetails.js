@@ -23,7 +23,7 @@ router.post('/playGame', authenticate, async(req, res) => {
     
     const previousGame = await GameHistory.findOne({userId: username, gameId})
     const user = await User.findOne({userId: username});
-    const game = await Game.findOne({gameId});
+    const game = await Game.findOne({_id:gameId});
 
     if(!game){
 
@@ -36,6 +36,7 @@ router.post('/playGame', authenticate, async(req, res) => {
     totalAmount+=playedOptions.diamond.length*(game.ticketAmount.diamond)
 
     const remainingAmount = totalAmount-previousGame.totalAmount;
+    let userDetails, gameHistory;
     if(remainingAmount<user.balance){
         user.balance-=remainingAmount;
 
@@ -47,9 +48,10 @@ router.post('/playGame', authenticate, async(req, res) => {
         });
 
         // TODO: to persist this using transaction
-        await user.save();
-        await gameHistory.save();
+        userDetails=await user.save();
+        gameHistory = await gameHistory.save();
     }
+    res.send({userDetails, gameHistory});
 
 })
 
