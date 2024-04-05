@@ -11,7 +11,6 @@ router.get('/', authenticate, async (req, res) => {
     const user = await User.findOne({ _id: req.user });
     
     res.json({ message: 'Protected route accessed successfully', user: req.user, user });
-
     
 });
 

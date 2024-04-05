@@ -2,12 +2,6 @@
 const mongoose = require('mongoose');
 
 const gameHistorySchenma = new mongoose.Schema({
-    // userId: { type: String, required: true},
-    // transactionId: {type: String, required: true, unique: true},
-    // status: {type: String, enum: ['PENDING', 'SUCCESS', 'FAILURE']},
-    // amount: {type: Number},
-    // approvedBy: {type: String},
-    // version: { type: Number, default: 1 },
 
     gameId: {type: String, required: true},
 
@@ -16,19 +10,18 @@ const gameHistorySchenma = new mongoose.Schema({
     playedOptions: {
         type: {
             silver: {
-                type: [String]
+                type: [Number]
             },
             gold: {
-                type: [String]
+                type: [Number]
             },
             diamond: {
-                type: [String]
+                type: [Number]
             }
         }
     },
     
     totalAmount: {type: Number},
-    
 
 });
 

@@ -9,7 +9,6 @@ const GameHistory = require('../models/GameHistory');
 const router = express.Router();
 
 router.post('/getGameDetails', authenticate, async (req, res) => {
-    console.log(req.user)
 
     const game = await Game.findOne({status: "ACTIVE"})
     const gameHistory = await GameHistory.findOne({userId: req.user.username, gameId: game.id}) 
@@ -19,39 +18,70 @@ router.post('/getGameDetails', authenticate, async (req, res) => {
 });
 
 router.post('/playGame', authenticate, async(req, res) => {
-    const { username, gameId, playedOptions } = req.body;
+
+
+    try{
+
     
-    const previousGame = await GameHistory.findOne({userId: username, gameId})
-    const user = await User.findOne({userId: username});
-    const game = await Game.findOne({_id:gameId});
+        let { gameId, playedOptions } = req.body;
 
-    if(!game){
 
-        res.send("no game available");
-    }
+        // const username = req.user;
 
-    const totalAmount = 0.0;
-    totalAmount+=playedOptions.silver.length*(game.ticketAmount.silver)
-    totalAmount+=playedOptions.gold.length*(game.ticketAmount.gold)
-    totalAmount+=playedOptions.diamond.length*(game.ticketAmount.diamond)
+        let user = await User.findOne({ _id: req.user.id });
+        let gameHistory = await GameHistory.findOne({userId: user.username, gameId})
+        let game = await Game.findOne({_id:gameId});
 
-    const remainingAmount = totalAmount-previousGame.totalAmount;
-    let userDetails, gameHistory;
-    if(remainingAmount<user.balance){
-        user.balance-=remainingAmount;
+        if(!game){
+            res.send("no game available");
+        }
 
-        const gameHistory = new GameHistory({
-            gameId,
-            userId: username,
-            playedOptions,
-            totalAmount: totalAmount
+        let totalAmount = 0.0;
+        playedOptions.silver.forEach(element => {
+            totalAmount+=element*game.ticketAmount.silver
         });
+        playedOptions.gold.forEach(element => {
+            totalAmount+=element*game.ticketAmount.gold
+        });
+        playedOptions.diamond.forEach(element => {
+            totalAmount+=element*game.ticketAmount.diamond
+        });
+    
+        let remainingAmount = totalAmount;
+        if(gameHistory!=null){
+            remainingAmount-=gameHistory.totalAmount
+        }else{
+            gameHistory = new GameHistory({
+                gameId,
+                playedOptions,
+                userId: user.username,
+                totalAmount
+            });
+        }
+        
+        if((user.balance-remainingAmount)>=0){
 
-        // TODO: to persist this using transaction
-        userDetails=await user.save();
-        gameHistory = await gameHistory.save();
+
+            console.log("remaining amount : "+remainingAmount)
+            user.balance-=remainingAmount;
+            gameHistory.totalAmount=totalAmount;
+            gameHistory.playedOptions=playedOptions
+
+
+            // TODO: to persist this using transaction
+            const updatedUser=await user.save();
+            const updatedGameHistory = await gameHistory.save();
+
+            res.send({updatedUser, updatedGameHistory});
+
+        }else{
+
+            res.send("insufficient balance");
+        }
+
+    }catch(e){
+        res.send(e)
     }
-    res.send({userDetails, gameHistory});
 
 })
 
@@ -59,17 +89,12 @@ router.post('/playGame', authenticate, async(req, res) => {
 
 router.post('/createGame', async (req, res)=>{
 
-    console.log(req.body);
 
     const activeGame = await Game.findOne({status: "ACTIVE"});
     if(activeGame!=null){
         activeGame.status = "CLOSED";
         activeGame.save();
     }
-
-    console.log("activeGame")
-    console.log(activeGame);
-    // console.log()
     
     const {gameId, startTime, endTime, ticketAmount} = req.body;
     const game = new Game({
