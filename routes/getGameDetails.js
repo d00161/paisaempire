@@ -78,21 +78,7 @@ router.post('/createGame', async (req, res)=>{
         ticketAmount: ticketAmount
     });
     const activegame = await game.save();
-
-
-    const gameHistory = new GameHistory({
-        "gameId": "660fd9b25464b557b48631e7",
-        "userId": "b"
-    });
-    await gameHistory.save();
-
     res.send(activegame);
-
-
-    
-
-
-
 });
 
 
