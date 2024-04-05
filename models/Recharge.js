@@ -6,6 +6,7 @@ const rechargeSchenma = new mongoose.Schema({
     transactionId: {type: String, required: true, unique: true},
     status: {type: String, enum: ['PENDING', 'SUCCESS', 'FAILURE']},
     amount: {type: Number},
+    approvedBy: {type: String},
     version: { type: Number, default: 1 }
 });
 

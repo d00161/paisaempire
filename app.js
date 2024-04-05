@@ -3,6 +3,8 @@ const express = require('express');
 const registerRoute = require('./routes/register');
 const loginRoute = require('./routes/login');
 const rechargeRoute = require('./routes/recharge')
+const gameHistoryRoute = require('./routes/getGameDetails')
+
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
 var cors = require('cors')
@@ -27,6 +29,7 @@ app.use(express.json());
 app.use('/register', registerRoute);
 app.use('/login', loginRoute);
 app.use('/recharge', rechargeRoute)
+app.use('/', gameHistoryRoute)
 
 
 app.get('/test', authenticate, async (req, res) => {
