@@ -11,7 +11,9 @@ const router = express.Router();
 router.post('/getGameDetails', authenticate, async (req, res) => {
 
     const game = await Game.findOne({status: "ACTIVE"})
-    const gameHistory = await GameHistory.findOne({userId: req.user.username, gameId: game.id}) 
+    console.log(req.user)
+    console.log(game)
+    const gameHistory = await GameHistory.findOne({userId: req.user.id, gameId: game.id}) 
     
     res.json({ game, gameHistory });
 
@@ -19,17 +21,10 @@ router.post('/getGameDetails', authenticate, async (req, res) => {
 
 router.post('/playGame', authenticate, async(req, res) => {
 
-
     try{
-
-    
         let { gameId, playedOptions } = req.body;
-
-
-        // const username = req.user;
-
         let user = await User.findOne({ _id: req.user.id });
-        let gameHistory = await GameHistory.findOne({userId: user.username, gameId})
+        let gameHistory = await GameHistory.findOne({userId: user.id, gameId})
         let game = await Game.findOne({_id:gameId});
 
         if(!game){
@@ -54,15 +49,12 @@ router.post('/playGame', authenticate, async(req, res) => {
             gameHistory = new GameHistory({
                 gameId,
                 playedOptions,
-                userId: user.username,
+                userId: user.id,
                 totalAmount
             });
         }
         
         if((user.balance-remainingAmount)>=0){
-
-
-            console.log("remaining amount : "+remainingAmount)
             user.balance-=remainingAmount;
             gameHistory.totalAmount=totalAmount;
             gameHistory.playedOptions=playedOptions
