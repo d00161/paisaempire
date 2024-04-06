@@ -22,6 +22,7 @@ router.post('/getGameDetails', authenticate, async (req, res) => {
 router.post('/playGame', authenticate, async(req, res) => {
 
     try{
+
         let { gameId, playedOptions } = req.body;
         let user = await User.findOne({ _id: req.user.id });
         let gameHistory = await GameHistory.findOne({userId: user.id, gameId})
@@ -33,6 +34,7 @@ router.post('/playGame', authenticate, async(req, res) => {
 
         let totalAmount = 0.0;
         playedOptions.silver.forEach(element => {
+            console.log(element)
             totalAmount+=element*game.ticketAmount.silver
         });
         playedOptions.gold.forEach(element => {
@@ -40,8 +42,7 @@ router.post('/playGame', authenticate, async(req, res) => {
         });
         playedOptions.diamond.forEach(element => {
             totalAmount+=element*game.ticketAmount.diamond
-        });
-    
+        });    
         let remainingAmount = totalAmount;
         if(gameHistory!=null){
             remainingAmount-=gameHistory.totalAmount
@@ -59,13 +60,10 @@ router.post('/playGame', authenticate, async(req, res) => {
             gameHistory.totalAmount=totalAmount;
             gameHistory.playedOptions=playedOptions
 
-
             // TODO: to persist this using transaction
             const updatedUser=await user.save();
             const updatedGameHistory = await gameHistory.save();
-
-            res.send({updatedUser, updatedGameHistory});
-
+            res.send({game, updatedGameHistory});
         }else{
 
             res.send("insufficient balance");
