@@ -66,6 +66,7 @@ router.post('/', authenticate, async (req, res) => {
     try {
 
         let user = await User.findOne({_id: req.user.id}).session(session)
+        console.log("recharge for user: "+user)
     
         let recharge = new Recharge({
             userId: user._id,
@@ -99,9 +100,12 @@ router.post('/approveTransaction', authenticate, async (req, res) => {
     try {
 
 
+        console.log(req.body)
+        console.log(req.user)
+
 
         let user = await User.findOne({_id: req.user.id}).session(session);
-        let recharge = await Recharge.findOne({_id: req.body.rechargeId});
+        let recharge = await Recharge.findOne({transactionId: req.body.transactionId});
 
         if(recharge.status != "PENDING"){
             throw error("can not approve this recharge");
@@ -111,6 +115,7 @@ router.post('/approveTransaction', authenticate, async (req, res) => {
         recharge.approvedBy = user._id;
         let receiver = await User.findOne({_id: recharge.userId});
         receiver.balance += recharge.amount;
+
 
 
     
@@ -127,7 +132,12 @@ router.post('/approveTransaction', authenticate, async (req, res) => {
 
         await session.endSession();
 
-        res.json(user)
+        res.json({
+            userId: receiver.username,
+            transactionId: recharge.transactionId,
+            status: recharge.status,
+            amount: recharge.amount
+        })
     } catch (error) {
 
 
@@ -135,8 +145,30 @@ router.post('/approveTransaction', authenticate, async (req, res) => {
         await session.endSession();
 
         console.log(error)
-        res.status(500).json({ message: 'Error logging in' });
+        res.status(500).json({ message: 'Error while approving the transaction' });
     }
 })
+
+
+router.post('/pendingTransactions', authenticate, async (req, res) => {
+
+    try {
+        let user = await User.findOne({_id: req.user.id})
+        console.log("recharge for user: "+user)
+    
+        let recharges = await Recharge.find({status:"PENDING"})
+        console.log(recharges)
+
+        res.send(recharges)
+    } catch (error) {
+
+
+        console.log(error)
+        res.status(500).json({ message: 'Error while fetching pending recharges.' });
+    }
+});
+
+
+
 
 module.exports = router;

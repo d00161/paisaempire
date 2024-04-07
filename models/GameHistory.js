@@ -23,6 +23,8 @@ const gameHistorySchenma = new mongoose.Schema({
     
     totalAmount: {type: Number},
 
+    status: {type: String}
+
 });
 
 gameHistorySchenma.pre('save', function (next) {

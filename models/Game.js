@@ -6,7 +6,7 @@ const gameSchenma = new mongoose.Schema({
     gameId: {type: String, required: true},
     startTime: {type: String, required: true},
     endTime: {type: String, required: true},
-    status: {type: String, enum: ['ACTIVE', 'CLOSED']},
+    status: {type: String, enum: ["ACTIVE", "STOPPED", "CLOSED"]},
     result: {type: [Number]},
     ticketAmount: {
         type: {
