@@ -10,10 +10,11 @@ const gameSchenma = new mongoose.Schema({
     result: {type: [Number]},
     ticketAmount: {
         type: {
-            "silver": {type: Number},
-            "gold": {type: Number},
-            "diamond": {type: Number}
-        }
+            "silver": {type: Number, required: true},
+            "gold": {type: Number, required: true},
+            "diamond": {type: Number, required: true}
+        },
+        required: true
     },
     winners: {type: [
         {
