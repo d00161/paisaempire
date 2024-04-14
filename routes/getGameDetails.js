@@ -68,9 +68,9 @@ router.post('/playGame', authenticate, async(req, res) => {
             gameHistory.playedOptions=playedOptions
 
             // TODO: to persist this using transaction
-            const updatedUser=await user.save();
+            const userDetails=await user.save();
             const updatedGameHistory = await gameHistory.save();
-            res.send({game, updatedGameHistory});
+            res.send({game, updatedGameHistory, userDetails});
         }else{
 
             res.send("insufficient balance");
